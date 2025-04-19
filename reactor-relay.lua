@@ -1,6 +1,3 @@
-execute("rm wpp")
-execute("wget https://raw.githubusercontent.com/jdf221/CC-WirelessPeripheral/main/wpp.lua wpp")
-
 local reactorNumber = 1
 local reactorQuadrant = "lc"
 local reactorTriplet = "b"
