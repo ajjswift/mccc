@@ -55,4 +55,7 @@ elseif type == "control" then
     end
 end
 
--- shell.execute("reboot");
+print("Setup complete. Restarting in 2 seconds.")
+
+os.sleep(2)
+shell.execute("reboot");
