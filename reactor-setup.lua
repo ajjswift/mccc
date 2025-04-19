@@ -15,28 +15,39 @@ elseif type == "control" then
     -- Download the reactor-control.lua file
     shell.run("wget https://raw.githubusercontent.com/ajjswift/mccc/refs/heads/main/reactor-control.lua temp_reactor_control.lua")
 
-    -- Read the content of the downloaded file
-    local file = io.open("temp_reactor_control.lua", "r")
-    if not file then
+    -- Open the downloaded file for reading
+    local inFile = fs.open("temp_reactor_control.lua", "r")
+    if not inFile then
         print("Error: Could not open temp_reactor_control.lua for reading")
         return
     end
-    local content = file:read("a")
-    file:close()
 
-    -- Modify the content to set the variables
-    content = string.gsub(content, "local reactorNumber = .*", "local reactorNumber = " .. reactorNumber)
-    content = string.gsub(content, "local reactorQuadrant = \".*\"", "local reactorQuadrant = \"" .. reactorQuadrant .. "\"")
-    content = string.gsub(content, "local reactorTriplet = \".*\"", "local reactorTriplet = \"" .. reactorTriplet .. "\"")
-
-    -- Write the modified content to startup.lua
-    file = io.open("startup.lua", "w")
-    if not file then
+    -- Open the startup file for writing
+    local outFile = fs.open("startup.lua", "w")
+    if not outFile then
         print("Error: Could not open startup.lua for writing")
+        inFile.close()
         return
     end
-    file:write(content)
-    file:close()
+
+    -- Process each line
+    while true do
+        local line = inFile.readLine()
+        if not line then break end
+
+        if line:match("^local%s+reactorNumber%s*=") then
+            outFile.writeLine("local reactorNumber = " .. reactorNumber)
+        elseif line:match("^local%s+reactorQuadrant%s*=") then
+            outFile.writeLine("local reactorQuadrant = \"" .. reactorQuadrant .. "\"")
+        elseif line:match("^local%s+reactorTriplet%s*=") then
+            outFile.writeLine("local reactorTriplet = \"" .. reactorTriplet .. "\"")
+        else
+            outFile.writeLine(line)
+        end
+    end
+
+    inFile.close()
+    outFile.close()
 
     -- Delete the temporary file
     fs.delete("temp_reactor_control.lua")
