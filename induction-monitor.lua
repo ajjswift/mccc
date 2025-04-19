@@ -11,15 +11,19 @@ local function joulesToFE(joules)
   return joules * 0.4
 end
 
--- Function to format large numbers with commas
-local function formatNumber(num)
-  local formatted = tostring(math.floor(num))
-  local k
-  while true do
-    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", "%1,%2")
-    if k == 0 then break end
+-- Function to format energy with appropriate units
+local function formatEnergy(energy)
+  local units = {"", "K", "M", "G", "T", "P", "E", "Z", "Y"}
+  local unitIndex = 1
+  
+  while energy >= 1000 and unitIndex < #units do
+    energy = energy / 1000
+    unitIndex = unitIndex + 1
   end
-  return formatted
+  
+  -- Format with up to 2 decimal places, but remove trailing zeros
+  local formatted = string.format("%.2f", energy):gsub("%.?0+$", "")
+  return formatted .. units[unitIndex] .. "FE"
 end
 
 -- Function to draw a centered progress bar
@@ -68,9 +72,9 @@ while true do
   local energyFE = joulesToFE(energy)
   local maxEnergyFE = joulesToFE(maxEnergy)
   
-  -- Format text
-  local energyText = formatNumber(energyFE) .. " FE"
-  local maxEnergyText = formatNumber(maxEnergyFE) .. " FE"
+  -- Format text with appropriate units
+  local energyText = formatEnergy(energyFE)
+  local maxEnergyText = formatEnergy(maxEnergyFE)
   local statusText = energyText .. " / " .. maxEnergyText
   
   -- Clear screen
