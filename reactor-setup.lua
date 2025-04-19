@@ -17,4 +17,4 @@ if type == "control" then
 end
 
 
-shell.execute("reboot");
+-- shell.execute("reboot");
