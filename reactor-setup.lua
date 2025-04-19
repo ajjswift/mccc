@@ -9,28 +9,20 @@ local reactorNumber = tArgs[4]
 -- Download wpp
 shell.run("wget https://raw.githubusercontent.com/jdf221/CC-WirelessPeripheral/main/wpp.lua wpp")
 
-if type == "relay" then
-    shell.run("wget https://raw.githubusercontent.com/ajjswift/mccc/refs/heads/main/reactor-relay.lua startup.lua")
-elseif type == "control" then
-    -- Download the reactor-control.lua file
-    shell.run("wget https://raw.githubusercontent.com/ajjswift/mccc/refs/heads/main/reactor-control.lua temp_reactor_control.lua")
-
-    -- Open the downloaded file for reading
-    local inFile = fs.open("temp_reactor_control.lua", "r")
+local function patchFile(inputFile, outputFile)
+    local inFile = fs.open(inputFile, "r")
     if not inFile then
-        print("Error: Could not open temp_reactor_control.lua for reading")
-        return
+        print("Error: Could not open " .. inputFile .. " for reading")
+        return false
     end
 
-    -- Open the startup file for writing
-    local outFile = fs.open("startup.lua", "w")
+    local outFile = fs.open(outputFile, "w")
     if not outFile then
-        print("Error: Could not open startup.lua for writing")
+        print("Error: Could not open " .. outputFile .. " for writing")
         inFile.close()
-        return
+        return false
     end
 
-    -- Process each line
     while true do
         local line = inFile.readLine()
         if not line then break end
@@ -48,9 +40,19 @@ elseif type == "control" then
 
     inFile.close()
     outFile.close()
+    return true
+end
 
-    -- Delete the temporary file
-    fs.delete("temp_reactor_control.lua")
+if type == "relay" then
+    shell.run("wget https://raw.githubusercontent.com/ajjswift/mccc/refs/heads/main/reactor-relay.lua temp_reactor_relay.lua")
+    if patchFile("temp_reactor_relay.lua", "startup.lua") then
+        fs.delete("temp_reactor_relay.lua")
+    end
+elseif type == "control" then
+    shell.run("wget https://raw.githubusercontent.com/ajjswift/mccc/refs/heads/main/reactor-control.lua temp_reactor_control.lua")
+    if patchFile("temp_reactor_control.lua", "startup.lua") then
+        fs.delete("temp_reactor_control.lua")
+    end
 end
 
 -- shell.execute("reboot");
