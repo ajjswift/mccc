@@ -10,7 +10,6 @@ os.sleep(10)
 wpp.wireless.connect(string.format("reactor-management-%s-%s-%d", reactorQuadrant, reactorTriplet, reactorNumber))
 
 local reactor = wpp.peripheral.find("fusionReactorLogicAdapter");
-print(reactor);
 
 local monitor = peripheral.wrap("right");
 
@@ -19,7 +18,6 @@ local w,h = monitor.getSize()
 
 while true do
     local reactorName = string.format("Reactor rc-%s-%s-%d", reactorQuadrant, reactorTriplet, reactorNumber);
-    print(reactorName);
     local productionRate = reactor.getProductionRate() * 0.4
     local injectionRate = reactor.getInjectionRate()
 
